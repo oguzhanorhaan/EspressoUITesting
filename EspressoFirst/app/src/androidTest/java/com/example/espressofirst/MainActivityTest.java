@@ -1,5 +1,6 @@
 package com.example.espressofirst;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.View;
 import android.widget.EditText;
@@ -8,12 +9,15 @@ import androidx.test.InstrumentationRegistry;
 import androidx.test.espresso.matcher.BoundedMatcher;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.AndroidJUnit4;
+import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.Collection;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -26,6 +30,8 @@ import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static androidx.test.runner.lifecycle.Stage.RESUMED;
+import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
@@ -124,6 +130,30 @@ public class MainActivityTest {
     public void buttonShouldUpdateText_ASYNC(){
         onView(withId(R.id.asyncButton)).perform(click());
         onView(withId(R.id.inputField)).check(matches(withText("Done")));
+    }
+
+    @Test
+    public void navigateToSecondActivity() {
+        onView(withText("Change Page")).perform(click());
+        Activity activity = getActivityInstance();
+        boolean b = (activity instanceof  SecondActivity);
+        assertTrue(b);
+    }
+
+    public Activity getActivityInstance() {
+        final Activity[] activity = new Activity[1];
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable( ) {
+            public void run() {
+                Activity currentActivity = null;
+                Collection resumedActivities = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(RESUMED);
+                if (resumedActivities.iterator().hasNext()){
+                    currentActivity = (Activity) resumedActivities.iterator().next();
+                    activity[0] = currentActivity;
+                }
+            }
+        });
+
+        return activity[0];
     }
 
 }

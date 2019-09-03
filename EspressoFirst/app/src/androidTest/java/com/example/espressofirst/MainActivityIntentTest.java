@@ -11,6 +11,7 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.toPackage;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -25,12 +26,29 @@ public class MainActivityIntentTest {
     public IntentsTestRule<MainActivity> mActivityIntentRule = new IntentsTestRule<>(MainActivity.class);
 
     @Test
-    public void triggerIntentTest() {
+    public void triggerIntent_hasExtras() {
+        // check the button is there
+        onView(withId(getResourceId("switchActivity"))).check(matches(notNullValue() ));
+        onView(withId(getResourceId("switchActivity"))).check(matches(withText("Change Page")));
+        onView(withId(getResourceId("switchActivity"))).perform(click());
+        intended(hasExtra("Developer", "Oguzhan Orhan"));
+    }
+
+    @Test
+    public void triggerIntentChange(){
         // check the button is there
         onView(withId(getResourceId("switchActivity"))).check(matches(notNullValue() ));
         onView(withId(getResourceId("switchActivity"))).check(matches(withText("Change Page")));
         onView(withId(getResourceId("switchActivity"))).perform(click());
         intended(toPackage(SecondActivity.class.getPackage().getName()));
-        intended(hasExtra("Developer", "Oguzhan Orhan"));
+    }
+
+    @Test
+    public void triggerIntentChange_v2(){
+        // check the button is there
+        onView(withId(getResourceId("switchActivity"))).check(matches(notNullValue() ));
+        onView(withId(getResourceId("switchActivity"))).check(matches(withText("Change Page")));
+        onView(withId(getResourceId("switchActivity"))).perform(click());
+        intended(hasComponent(SecondActivity.class.getName()));  /*that can be used also */
     }
 }
